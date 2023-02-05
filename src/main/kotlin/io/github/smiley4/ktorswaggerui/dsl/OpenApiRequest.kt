@@ -78,7 +78,7 @@ class OpenApiRequest {
      * The request body applicable for this operation
      */
     fun body(type: CapturedType, block: OpenApiSimpleBody.() -> Unit) {
-        body = OpenApiSimpleBody(type).apply(block)
+        body = OpenApiSimpleBody(type).apply { required = true }.apply(block)
     }
 
     /**

@@ -13,7 +13,12 @@ class OApiSchemaBuilder {
 
 
     fun build(type: CapturedType, components: ComponentsContext, config: SwaggerUIPluginConfig): Schema<Any> {
-        return jsonSchemaBuilder.build(type, components, config)
+        return try {
+            jsonSchemaBuilder.build(type, components, config)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            return Schema<Any>().apply { this.type = "object" }
+        }
     }
 
 }
