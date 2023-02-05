@@ -36,7 +36,6 @@ val SwaggerUI = createApplicationPlugin(name = "SwaggerUI", createConfiguration 
 data class CapturedType(val kType: KType, val serializer: KSerializer<*>?)
 
 @PublishedApi
-@OptIn(ExperimentalStdlibApi::class)
 internal inline fun <reified TYPE> captureType(): CapturedType {
     val serializer = try {
         serializer<TYPE>()

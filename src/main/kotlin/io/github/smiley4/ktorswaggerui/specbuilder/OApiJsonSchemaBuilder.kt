@@ -6,9 +6,9 @@ import com.github.victools.jsonschema.generator.SchemaGenerator
 import io.github.smiley4.ktorswaggerui.CapturedType
 import io.github.smiley4.ktorswaggerui.SwaggerUIPluginConfig
 import io.swagger.v3.oas.models.media.Schema
-import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.serializer
-import java.lang.reflect.Type
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.javaType
@@ -34,8 +34,58 @@ class OApiJsonSchemaBuilder {
     }
 
 
+    @OptIn(ExperimentalSerializationApi::class)
     private fun createSchema(descriptor: SerialDescriptor, config: SwaggerUIPluginConfig): Schema<Any> {
-
+        return Schema<Any>().apply {
+            when (descriptor.kind) {
+                PrimitiveKind.BOOLEAN -> type = "boolean"
+                PrimitiveKind.STRING -> type = "string"
+                PrimitiveKind.CHAR -> {
+                    type = "string"
+                    minLength = 1
+                    maxLength = 1
+                }
+                PrimitiveKind.BYTE -> {
+                    type = "integer"
+                    minimum = Byte.MIN_VALUE.toLong().toBigDecimal()
+                    maximum = Byte.MAX_VALUE.toLong().toBigDecimal()
+                }
+                PrimitiveKind.SHORT -> {
+                    type = "integer"
+                    minimum = Short.MIN_VALUE.toLong().toBigDecimal()
+                    maximum = Short.MAX_VALUE.toLong().toBigDecimal()
+                }
+                PrimitiveKind.INT -> {
+                    type = "integer"
+                    minimum = Int.MIN_VALUE.toBigDecimal()
+                    maximum = Int.MAX_VALUE.toBigDecimal()
+                }
+                PrimitiveKind.LONG -> {
+                    type = "integer"
+                    minimum = Long.MIN_VALUE.toBigDecimal()
+                    maximum = Long.MAX_VALUE.toBigDecimal()
+                }
+                PrimitiveKind.FLOAT -> {
+                    type = "number"
+                    format = "float"
+                }
+                PrimitiveKind.DOUBLE -> {
+                    type = "double"
+                    format = "float"
+                }
+                SerialKind.ENUM -> {
+                    type = "string"
+                    enum = descriptor.elementNames.toList()
+                }
+                StructureKind.LIST -> TODO()
+                StructureKind.MAP -> TODO()
+                PolymorphicKind.OPEN -> TODO()
+                PolymorphicKind.SEALED -> TODO()
+                SerialKind.CONTEXTUAL -> TODO()
+                StructureKind.CLASS -> TODO()
+                StructureKind.OBJECT -> TODO()
+            }
+        }
     }
 
     private fun createSchema(type: CapturedType, config: SwaggerUIPluginConfig): Schema<Any> {
@@ -69,10 +119,11 @@ class OApiJsonSchemaBuilder {
 
 
     private fun createObjectSchema(type: CapturedType, config: SwaggerUIPluginConfig): Schema<Any> {
-        return if (type is Class<*> && type.isEnum) {
+        val enum = (type.kType.classifier as? KClass<*>)?.java?.takeIf { it.isEnum }
+        return if (enum != null) {
             Schema<Any>().apply {
                 this.type = "string"
-                this.enum = type.enumConstants.map { it.toString() }
+                this.enum = enum.enumConstants.map { it.toString() }
             }
         } else {
             val jsonSchema = createObjectJsonSchema(type, config)
