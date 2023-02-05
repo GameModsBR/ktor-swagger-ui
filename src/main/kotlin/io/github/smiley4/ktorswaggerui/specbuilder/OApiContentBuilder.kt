@@ -95,8 +95,13 @@ class OApiContentBuilder {
     private fun buildSchema(body: OpenApiSimpleBody, components: ComponentsContext, config: SwaggerUIPluginConfig): Schema<Any>? {
         return if (body.customSchemaId != null) {
             buildSchemaFromCustom(body.customSchemaId!!, components, config.getCustomSchemas())
-        } else {
+        } else if (body.type != null) {
             buildSchemaFromType(body.type, components, config)
+        } else {
+            Schema<Any>().apply {
+                type = "string"
+                format = "binary"
+            }
         }
     }
 

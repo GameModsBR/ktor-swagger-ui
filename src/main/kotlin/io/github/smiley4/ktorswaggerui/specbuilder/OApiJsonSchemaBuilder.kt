@@ -8,6 +8,7 @@ import io.github.smiley4.ktorswaggerui.SwaggerUIPluginConfig
 import io.swagger.v3.oas.models.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.json.JsonObject
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.starProjectedType
@@ -37,12 +38,11 @@ class OApiJsonSchemaBuilder {
     private fun createSchema(descriptor: SerialDescriptor, capturedType: CapturedType, config: SwaggerUIPluginConfig): Schema<Any> {
         if (descriptor.isInline) {
             val elementDescriptor = descriptor.getElementDescriptor(0)
-            return createSchema(CapturedType(elementDescriptor.capturedKClass?.starProjectedType, elementDescriptor), config).apply {
-                description = descriptor.serialName
-            }
+            return createSchema(CapturedType(elementDescriptor.capturedKClass?.starProjectedType, elementDescriptor), config)
         }
         return Schema<Any>().apply {
             nullable = descriptor.isNullable
+            description = descriptor.serialName
             when (descriptor.kind) {
                 PrimitiveKind.BOOLEAN -> type = "boolean"
                 PrimitiveKind.STRING -> {
@@ -96,13 +96,27 @@ class OApiJsonSchemaBuilder {
                         items = createSchema(CapturedType(itemKType, itemDescriptor), config)
                     }
                 }
-                StructureKind.MAP, StructureKind.OBJECT -> {
+                StructureKind.MAP -> {
                     type = "object"
-                    nullable = descriptor.isNullable
+                    if (descriptor == serialDescriptor<JsonObject>()) {
+                        additionalProperties = true
+                    } else if (descriptor.elementsCount == 2) {
+                        val keyDescriptor = descriptor.getElementDescriptor(0)
+                        val valueDescriptor = descriptor.getElementDescriptor(1)
+                        val keyType = CapturedType(keyDescriptor.capturedKClass?.starProjectedType, keyDescriptor)
+                        val valueType = CapturedType(valueDescriptor.capturedKClass?.starProjectedType, valueDescriptor)
+                        properties = mapOf(
+                            "key" to createSchema(keyType, config),
+                        )
+                        additionalProperties = createSchema(valueType, config)
+                    }
+                    descriptor.getElementDescriptor(1)
+                }
+                StructureKind.OBJECT -> {
+                    type = "object"
                 }
                 StructureKind.CLASS, PolymorphicKind.SEALED-> {
                     type = "object"
-                    nullable = descriptor.isNullable
                     properties = descriptor.elementNames
                         .map { name ->
                             val index = descriptor.getElementIndex(name)
@@ -114,9 +128,7 @@ class OApiJsonSchemaBuilder {
                         }
                 }
                 PolymorphicKind.OPEN, SerialKind.CONTEXTUAL -> {
-                    createObjectJsonSchema(capturedType, config).apply {
-                        nullable = descriptor.isNullable
-                    }
+                    createObjectJsonSchema(capturedType, config)
                 }
             }
         }
@@ -131,6 +143,7 @@ class OApiJsonSchemaBuilder {
         return if (classifier is KClass<*> && classifier.isSubclassOf(Array::class)) {
             Schema<Any>().apply {
                 this.type = "array"
+                description = classifier.qualifiedName
                 val component = classifier.typeParameters.single().upperBounds.single()
                 val componentDescriptor = try {
                     serialDescriptor(component)
@@ -142,8 +155,9 @@ class OApiJsonSchemaBuilder {
             val enum = (classifier as? KClass<*>)?.java?.takeIf { it.isEnum }
             if (enum != null) {
                 Schema<Any>().apply {
+                    description = classifier.qualifiedName
                     this.type = "string"
-                    this.enum = enum.enumConstants.map { it.toString() }
+                    this.enum = enum.enumConstants.map { (it as Enum<*>).name }
                 }
             } else {
                 return createObjectSchema(type, config)
@@ -153,11 +167,13 @@ class OApiJsonSchemaBuilder {
 
 
     private fun createObjectSchema(type: CapturedType, config: SwaggerUIPluginConfig): Schema<Any> {
-        val enum = (type.kType?.classifier as? KClass<*>)?.java?.takeIf { it.isEnum }
+        val classifier = type.kType?.classifier
+        val enum = (classifier as? KClass<*>)?.java?.takeIf { it.isEnum }
         return if (enum != null) {
             Schema<Any>().apply {
                 this.type = "string"
-                this.enum = enum.enumConstants.map { it.toString() }
+                description = classifier.qualifiedName
+                this.enum = enum.enumConstants.map { (it as Enum<*>).name }
             }
         } else {
             val jsonSchema = createObjectJsonSchema(type, config)
