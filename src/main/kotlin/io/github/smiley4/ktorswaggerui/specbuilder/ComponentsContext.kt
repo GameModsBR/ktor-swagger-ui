@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.media.Schema
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.WildcardType
+import kotlin.reflect.jvm.javaType
 
 /**
  * Container holding and collecting information about the OpenApi "Components"-Object
@@ -30,21 +31,7 @@ data class ComponentsContext(
      */
     fun addArraySchema(type: CapturedType, schema: Schema<*>): Schema<Any> {
         if (this.schemasInComponents) {
-            val innerSchema: Schema<Any> = when (type) {
-                is Class<*> -> addSchema(type.componentType, schema.items)
-                is ParameterizedType -> {
-                    when (val actualTypeArgument = type.actualTypeArguments.firstOrNull()) {
-                        is Class<*> -> addSchema(actualTypeArgument, schema.items)
-                        is WildcardType -> {
-                            addSchema(actualTypeArgument.upperBounds.first(), schema.items)
-                        }
-
-                        else -> throw Exception("Could not add array-schema to components ($type)")
-                    }
-                }
-
-                else -> throw Exception("Could not add array-schema to components ($type)")
-            }
+            val innerSchema: Schema<Any> = addSchema(type.parameter(0), schema.items)
             return Schema<Any>().apply {
                 this.type = "array"
                 this.items = Schema<Any>().apply {
@@ -63,7 +50,7 @@ data class ComponentsContext(
      * @return a schema referencing the complete schema (or the original schema if 'schemasInComponents' = false)
      */
     fun addSchema(type: CapturedType, schema: Schema<*>): Schema<Any> {
-        return addSchema(getIdentifyingName(type), schema)
+        return addSchema(getIdentifyingName(type.kType!!.javaType), schema)
     }
 
 

@@ -4,8 +4,8 @@ import io.github.smiley4.ktorswaggerui.specbuilder.ApiSpecBuilder
 import io.ktor.server.application.*
 import io.ktor.server.application.hooks.*
 import io.ktor.server.webjars.*
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.serializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.serialDescriptor
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -33,15 +33,21 @@ val SwaggerUI = createApplicationPlugin(name = "SwaggerUI", createConfiguration 
 
 }
 
-data class CapturedType(val kType: KType, val serializer: KSerializer<*>?)
+data class CapturedType(val kType: KType?, val descriptor: SerialDescriptor?) {
+    fun parameter(index: Int): CapturedType {
+        val paramKType = kType?.arguments?.get(index)?.type
+        val paramDescriptor = kType?.let(::serialDescriptor)
+        return CapturedType(paramKType, paramDescriptor)
+    }
+}
 
 @PublishedApi
 internal inline fun <reified TYPE> captureType(): CapturedType {
-    val serializer = try {
-        serializer<TYPE>()
+    val descriptor = try {
+        serialDescriptor<TYPE>()
     } catch (_: Exception) { null }
     val kClass = typeOf<TYPE>()
-    return CapturedType(kClass, serializer)
+    return CapturedType(kClass, descriptor)
     /*return if (kClass.isValue) {
         kClass.declaredMembers.first { it is KProperty<*> }.returnType.javaType
     } else {

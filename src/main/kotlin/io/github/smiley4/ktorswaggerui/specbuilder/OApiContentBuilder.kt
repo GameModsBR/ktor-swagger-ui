@@ -2,21 +2,13 @@ package io.github.smiley4.ktorswaggerui.specbuilder
 
 import io.github.smiley4.ktorswaggerui.CapturedType
 import io.github.smiley4.ktorswaggerui.SwaggerUIPluginConfig
-import io.github.smiley4.ktorswaggerui.dsl.CustomJsonSchema
-import io.github.smiley4.ktorswaggerui.dsl.CustomOpenApiSchema
-import io.github.smiley4.ktorswaggerui.dsl.CustomSchemas
-import io.github.smiley4.ktorswaggerui.dsl.OpenApiBaseBody
-import io.github.smiley4.ktorswaggerui.dsl.OpenApiExample
-import io.github.smiley4.ktorswaggerui.dsl.OpenApiMultipartBody
-import io.github.smiley4.ktorswaggerui.dsl.OpenApiSimpleBody
-import io.github.smiley4.ktorswaggerui.dsl.RemoteSchema
-import io.ktor.http.ContentType
-import io.swagger.v3.oas.models.media.Content
-import io.swagger.v3.oas.models.media.Encoding
-import io.swagger.v3.oas.models.media.MediaType
-import io.swagger.v3.oas.models.media.Schema
-import io.swagger.v3.oas.models.media.XML
-import java.lang.reflect.Type
+import io.github.smiley4.ktorswaggerui.dsl.*
+import io.ktor.http.*
+import io.swagger.v3.oas.models.media.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
+import kotlin.reflect.jvm.javaType
 
 /**
  * Builder for the OpenAPI Content Object (e.g. request and response bodies)
@@ -168,11 +160,12 @@ class OApiContentBuilder {
 
     private fun prepareForXml(type: CapturedType, schema: Schema<Any>): Schema<Any> {
         schema.xml = XML().apply {
-            if (type is Class<*>) {
-                name = if (type.isArray) {
-                    type.componentType.simpleName
+            val javaType = type.kType?.javaType
+            if (javaType is Class<*>) {
+                name = if (javaType.isArray) {
+                    javaType.componentType.simpleName
                 } else {
-                    type.simpleName
+                    javaType.simpleName
                 }
             }
         }
