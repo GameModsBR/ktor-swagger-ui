@@ -59,6 +59,13 @@ class OApiJsonSchemaBuilder {
                             format = "uuid"
                             example(UUID.randomUUID().toString())
                         }
+                        "Decimal" -> {
+                            format = "decimal"
+                            example = "2.0"
+                        }
+                        "Currency" -> {
+                            example = "BRL"
+                        }
                         else -> if (descriptor.isNullable) example("string?")
                     }
                 }
