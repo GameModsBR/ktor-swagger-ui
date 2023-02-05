@@ -1,5 +1,5 @@
 package io.github.smiley4.ktorswaggerui.dsl
-import java.lang.reflect.Type
+import io.github.smiley4.ktorswaggerui.CapturedType
 
 @OpenApiDslMarker
 class OpenApiRequestParameter(
@@ -10,7 +10,7 @@ class OpenApiRequestParameter(
     /**
      * The type defining the schema used for the parameter.
      */
-    val type: Type,
+    val type: CapturedType,
     /**
      * Location of the parameter
      */

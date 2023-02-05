@@ -1,5 +1,6 @@
 package io.github.smiley4.ktorswaggerui.specbuilder
 
+import io.github.smiley4.ktorswaggerui.CapturedType
 import io.github.smiley4.ktorswaggerui.dsl.OpenApiExample
 import io.swagger.v3.oas.models.media.Schema
 import java.lang.reflect.ParameterizedType
@@ -27,7 +28,7 @@ data class ComponentsContext(
      * The schema is an array, only the element type is added to the components-section
      * @return a schema referencing the complete schema (or the original schema if 'schemasInComponents' = false)
      */
-    fun addArraySchema(type: Type, schema: Schema<*>): Schema<Any> {
+    fun addArraySchema(type: CapturedType, schema: Schema<*>): Schema<Any> {
         if (this.schemasInComponents) {
             val innerSchema: Schema<Any> = when (type) {
                 is Class<*> -> addSchema(type.componentType, schema.items)
@@ -61,7 +62,7 @@ data class ComponentsContext(
      * Add the given schema for the given type to the components-section
      * @return a schema referencing the complete schema (or the original schema if 'schemasInComponents' = false)
      */
-    fun addSchema(type: Type, schema: Schema<*>): Schema<Any> {
+    fun addSchema(type: CapturedType, schema: Schema<*>): Schema<Any> {
         return addSchema(getIdentifyingName(type), schema)
     }
 

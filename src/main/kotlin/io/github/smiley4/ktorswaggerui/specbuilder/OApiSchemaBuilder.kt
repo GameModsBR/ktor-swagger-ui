@@ -1,11 +1,11 @@
 package io.github.smiley4.ktorswaggerui.specbuilder
 
+import io.github.smiley4.ktorswaggerui.CapturedType
 import io.github.smiley4.ktorswaggerui.SwaggerUIPluginConfig
 import io.swagger.v3.oas.models.media.Schema
 import java.io.File
-import java.lang.reflect.Type
 import java.math.BigDecimal
-import kotlin.reflect.KClass
+import java.time.Instant
 
 /**
  * Builder for an OpenAPI Schema Object
@@ -15,66 +15,70 @@ class OApiSchemaBuilder {
     private val jsonSchemaBuilder = OApiJsonSchemaBuilder()
 
 
-    fun build(type: Type, components: ComponentsContext, config: SwaggerUIPluginConfig): Schema<Any> {
+    fun build(type: CapturedType, components: ComponentsContext, config: SwaggerUIPluginConfig): Schema<Any> {
         return Schema<Any>().apply {
-            when (type) {
-                Byte::class.java -> {
+            when (type.kType) {
+                Byte::class -> {
                     this.type = "integer"
                     minimum = BigDecimal.valueOf(Byte.MIN_VALUE.toLong())
                     maximum = BigDecimal.valueOf(Byte.MAX_VALUE.toLong())
                 }
-                Short::class.java -> {
+                Short::class -> {
                     this.type = "integer"
                     minimum = BigDecimal.valueOf(Short.MIN_VALUE.toLong())
                     maximum = BigDecimal.valueOf(Short.MAX_VALUE.toLong())
                 }
-                Int::class.java -> {
+                Int::class -> {
                     this.type = "integer"
                     format = "int32"
                 }
-                Long::class.java -> {
+                Long::class -> {
                     this.type = "integer"
                     format = "int64"
                 }
-                UByte::class.java -> {
+                UByte::class -> {
                     this.type = "integer"
                     minimum = BigDecimal.valueOf(UByte.MIN_VALUE.toLong())
                     maximum = BigDecimal.valueOf(UByte.MAX_VALUE.toLong())
                 }
-                UShort::class.java -> {
+                UShort::class -> {
                     this.type = "integer"
                     minimum = BigDecimal.valueOf(UShort.MIN_VALUE.toLong())
                     maximum = BigDecimal.valueOf(UShort.MAX_VALUE.toLong())
                 }
-                UInt::class.java -> {
+                UInt::class -> {
                     this.type = "integer"
                     minimum = BigDecimal.valueOf(UInt.MIN_VALUE.toLong())
                     maximum = BigDecimal.valueOf(UInt.MAX_VALUE.toLong())
                 }
-                ULong::class.java -> {
+                ULong::class -> {
                     this.type = "integer"
                     minimum = BigDecimal.valueOf(ULong.MIN_VALUE.toLong())
                 }
-                Float::class.java -> {
+                Float::class -> {
                     this.type = "number"
                     format = "float"
                 }
-                Double::class.java -> {
+                Double::class -> {
                     this.type = "number"
                     format = "double"
                 }
-                Boolean::class.java -> {
+                Boolean::class -> {
                     this.type = "boolean"
                 }
-                Char::class.java -> {
+                Char::class -> {
                     this.type = "string"
                     minLength = 1
                     maxLength = 1
                 }
-                String::class.java -> {
+                String::class -> {
                     this.type = "string"
                 }
-                Array<Byte>::class.java, ByteArray::class.java -> {
+                Instant::class -> {
+                    this.type = "string"
+                    format = "date-time"
+                }
+                Array<Byte>::class, ByteArray::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "integer"
@@ -82,7 +86,7 @@ class OApiSchemaBuilder {
                         maximum = BigDecimal.valueOf(Byte.MAX_VALUE.toLong())
                     }
                 }
-                Array<Short>::class.java, ShortArray::class.java -> {
+                Array<Short>::class, ShortArray::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "integer"
@@ -90,21 +94,21 @@ class OApiSchemaBuilder {
                         maximum = BigDecimal.valueOf(Short.MAX_VALUE.toLong())
                     }
                 }
-                Array<Int>::class.java, IntArray::class.java -> {
+                Array<Int>::class, IntArray::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "integer"
                         format = "int32"
                     }
                 }
-                Array<Long>::class.java, LongArray::class.java -> {
+                Array<Long>::class, LongArray::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "integer"
                         format = "int64"
                     }
                 }
-                Array<UByte>::class.java -> {
+                Array<UByte>::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "integer"
@@ -112,7 +116,7 @@ class OApiSchemaBuilder {
                         maximum = BigDecimal.valueOf(UByte.MAX_VALUE.toLong())
                     }
                 }
-                Array<UShort>::class.java -> {
+                Array<UShort>::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "integer"
@@ -120,7 +124,7 @@ class OApiSchemaBuilder {
                         maximum = BigDecimal.valueOf(UShort.MAX_VALUE.toLong())
                     }
                 }
-                Array<UInt>::class.java -> {
+                Array<UInt>::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "integer"
@@ -128,21 +132,21 @@ class OApiSchemaBuilder {
                         maximum = BigDecimal.valueOf(UInt.MAX_VALUE.toLong())
                     }
                 }
-                Array<ULong>::class.java -> {
+                Array<ULong>::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "integer"
                         minimum = BigDecimal.valueOf(ULong.MIN_VALUE.toLong())
                     }
                 }
-                Array<Float>::class.java, FloatArray::class.java -> {
+                Array<Float>::class, FloatArray::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "number"
                         format = "float"
                     }
                 }
-                Array<Double>::class.java, DoubleArray::class.java -> {
+                Array<Double>::class, DoubleArray::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "number"
@@ -150,13 +154,13 @@ class OApiSchemaBuilder {
                     }
                 }
 
-                Array<Boolean>::class.java, BooleanArray::class.java -> {
+                Array<Boolean>::class, BooleanArray::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "boolean"
                     }
                 }
-                Array<Char>::class.java -> {
+                Array<Char>::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "string"
@@ -164,17 +168,17 @@ class OApiSchemaBuilder {
                         maxLength = 1
                     }
                 }
-                Array<String>::class.java -> {
+                Array<String>::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "string"
                     }
                 }
-                File::class.java -> {
+                File::class -> {
                     this.type = "string"
                     format = "binary"
                 }
-                Array<File>::class.java -> {
+                Array<File>::class -> {
                     this.type = "array"
                     items = Schema<String>().apply {
                         this.type = "string"

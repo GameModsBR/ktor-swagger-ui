@@ -1,23 +1,10 @@
 package io.github.smiley4.ktorswaggerui.dsl
 
-import io.ktor.http.HttpMethod
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.RouteSelector
-import io.ktor.server.routing.RouteSelectorEvaluation
-import io.ktor.server.routing.RoutingResolveContext
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.head
-import io.ktor.server.routing.method
-import io.ktor.server.routing.options
-import io.ktor.server.routing.patch
-import io.ktor.server.routing.post
-import io.ktor.server.routing.put
-import io.ktor.server.routing.route
-import io.ktor.util.KtorDsl
-import io.ktor.util.pipeline.PipelineContext
-import io.ktor.util.pipeline.PipelineInterceptor
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.routing.*
+import io.ktor.util.*
+import io.ktor.util.pipeline.*
 
 class DocumentedRouteSelector(val documentation: OpenApiRoute) : RouteSelector() {
 
@@ -33,6 +20,7 @@ class DocumentedRouteSelector(val documentation: OpenApiRoute) : RouteSelector()
     override fun toString() = if (includeDocumentedRouteInRouteToString) super.toString() else ""
 }
 
+@KtorDsl
 fun Route.documentation(
     documentation: OpenApiRoute.() -> Unit = { },
     build: Route.() -> Unit
@@ -46,6 +34,7 @@ fun Route.documentation(
 //           ROUTING          //
 //============================//
 
+@KtorDsl
 fun Route.route(
     path: String,
     builder: OpenApiRoute.() -> Unit = { },
@@ -54,6 +43,7 @@ fun Route.route(
     return documentation(builder) { route(path, build) }
 }
 
+@KtorDsl
 fun Route.route(
     path: String,
     method: HttpMethod,
@@ -63,6 +53,7 @@ fun Route.route(
     return documentation(builder) { route(path, method, build) }
 }
 
+@KtorDsl
 fun Route.method(
     method: HttpMethod,
     builder: OpenApiRoute.() -> Unit = { },
@@ -75,6 +66,7 @@ fun Route.method(
 //             GET            //
 //============================//
 
+@KtorDsl
 fun Route.get(
     path: String,
     builder: OpenApiRoute.() -> Unit = { },
@@ -83,6 +75,7 @@ fun Route.get(
     return documentation(builder) { get(path, body) }
 }
 
+@KtorDsl
 fun Route.get(
     builder: OpenApiRoute.() -> Unit = { },
     body: PipelineInterceptor<Unit, ApplicationCall>
@@ -94,6 +87,7 @@ fun Route.get(
 //            POST            //
 //============================//
 
+@KtorDsl
 fun Route.post(
     path: String,
     builder: OpenApiRoute.() -> Unit = { },
@@ -102,6 +96,7 @@ fun Route.post(
     return documentation(builder) { post(path, body) }
 }
 
+@KtorDsl
 @JvmName("postTyped")
 inline fun <reified R : Any> Route.post(
     noinline builder: OpenApiRoute.() -> Unit = { },
@@ -110,6 +105,7 @@ inline fun <reified R : Any> Route.post(
     return documentation(builder) { post(body) }
 }
 
+@KtorDsl
 @JvmName("postTypedPath")
 inline fun <reified R : Any> Route.post(
     path: String,
@@ -120,6 +116,7 @@ inline fun <reified R : Any> Route.post(
 }
 
 
+@KtorDsl
 fun Route.post(
     builder: OpenApiRoute.() -> Unit = { },
     body: PipelineInterceptor<Unit, ApplicationCall>
@@ -131,6 +128,7 @@ fun Route.post(
 //             PUT            //
 //============================//
 
+@KtorDsl
 fun Route.put(
     path: String,
     builder: OpenApiRoute.() -> Unit = { },
@@ -139,6 +137,7 @@ fun Route.put(
     return documentation(builder) { put(path, body) }
 }
 
+@KtorDsl
 fun Route.put(
     builder: OpenApiRoute.() -> Unit = { },
     body: PipelineInterceptor<Unit, ApplicationCall>
@@ -146,6 +145,7 @@ fun Route.put(
     return documentation(builder) { put(body) }
 }
 
+@KtorDsl
 @JvmName("putTyped")
 inline fun <reified R : Any> Route.put(
     noinline builder: OpenApiRoute.() -> Unit = { },
@@ -154,6 +154,7 @@ inline fun <reified R : Any> Route.put(
     return documentation(builder) { put(body) }
 }
 
+@KtorDsl
 @JvmName("putTypedPath")
 inline fun <reified R : Any> Route.put(
     path: String,
@@ -167,6 +168,7 @@ inline fun <reified R : Any> Route.put(
 //           DELETE           //
 //============================//
 
+@KtorDsl
 fun Route.delete(
     path: String,
     builder: OpenApiRoute.() -> Unit = { },
@@ -175,6 +177,7 @@ fun Route.delete(
     return documentation(builder) { delete(path, body) }
 }
 
+@KtorDsl
 fun Route.delete(
     builder: OpenApiRoute.() -> Unit = { },
     body: PipelineInterceptor<Unit, ApplicationCall>
@@ -225,6 +228,7 @@ inline fun <reified R : Any> Route.patch(
 //           OPTIONS          //
 //============================//
 
+@KtorDsl
 fun Route.options(
     path: String,
     builder: OpenApiRoute.() -> Unit = { },
@@ -233,6 +237,7 @@ fun Route.options(
     return documentation(builder) { options(path, body) }
 }
 
+@KtorDsl
 fun Route.options(
     builder: OpenApiRoute.() -> Unit = { },
     body: PipelineInterceptor<Unit, ApplicationCall>
@@ -244,6 +249,7 @@ fun Route.options(
 //            HEAD            //
 //============================//
 
+@KtorDsl
 fun Route.head(
     path: String,
     builder: OpenApiRoute.() -> Unit = { },
@@ -252,6 +258,7 @@ fun Route.head(
     return documentation(builder) { head(path, body) }
 }
 
+@KtorDsl
 fun Route.head(
     builder: OpenApiRoute.() -> Unit = { },
     body: PipelineInterceptor<Unit, ApplicationCall>

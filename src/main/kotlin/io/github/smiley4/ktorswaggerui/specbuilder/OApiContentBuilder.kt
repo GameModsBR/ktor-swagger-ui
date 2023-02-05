@@ -1,5 +1,6 @@
 package io.github.smiley4.ktorswaggerui.specbuilder
 
+import io.github.smiley4.ktorswaggerui.CapturedType
 import io.github.smiley4.ktorswaggerui.SwaggerUIPluginConfig
 import io.github.smiley4.ktorswaggerui.dsl.CustomJsonSchema
 import io.github.smiley4.ktorswaggerui.dsl.CustomOpenApiSchema
@@ -108,7 +109,7 @@ class OApiContentBuilder {
     }
 
 
-    private fun buildSchemaFromType(type: Type?, components: ComponentsContext, config: SwaggerUIPluginConfig): Schema<Any>? {
+    private fun buildSchemaFromType(type: CapturedType?, components: ComponentsContext, config: SwaggerUIPluginConfig): Schema<Any>? {
         return type
             ?.let { schemaBuilder.build(it, components, config) }
             ?.let { prepareForXml(type, it) }
@@ -165,7 +166,7 @@ class OApiContentBuilder {
     }
 
 
-    private fun prepareForXml(type: Type, schema: Schema<Any>): Schema<Any> {
+    private fun prepareForXml(type: CapturedType, schema: Schema<Any>): Schema<Any> {
         schema.xml = XML().apply {
             if (type is Class<*>) {
                 name = if (type.isArray) {

@@ -1,9 +1,9 @@
 package io.github.smiley4.ktorswaggerui.dsl
 
-import com.fasterxml.jackson.core.type.TypeReference
-import io.ktor.http.ContentType
-import java.lang.reflect.Type
-import kotlin.reflect.KClass
+import io.github.smiley4.ktorswaggerui.CapturedType
+import io.github.smiley4.ktorswaggerui.captureType
+import io.ktor.http.*
+import kotlin.collections.set
 
 /**
  * Describes one section of a multipart-body.
@@ -16,7 +16,7 @@ class OpenapiMultipartPart(
      */
     val name: String,
 
-    val type: Type?
+    val type: CapturedType?
 ) {
 
     /**
@@ -34,7 +34,7 @@ class OpenapiMultipartPart(
     /**
      * Possible headers for this part
      */
-    fun header(name: String, type: Type, block: OpenApiHeader.() -> Unit) {
+    fun header(name: String, type: CapturedType, block: OpenApiHeader.() -> Unit) {
         headers[name] = OpenApiHeader().apply(block).apply {
             this.type = type
         }
@@ -43,18 +43,13 @@ class OpenapiMultipartPart(
     /**
      * Possible headers for this part
      */
-    fun header(name: String, type: KClass<*>) = header(name, type.java) {}
-
-    /**
-     * Possible headers for this part
-     */
-    inline fun <reified TYPE> header(name: String) = header(name, object : TypeReference<TYPE>() {}.type) {}
+    inline fun <reified TYPE> header(name: String) = header(name, captureType<TYPE>()) {}
 
     /**
      * Possible headers for this part
      */
     inline fun <reified TYPE> header(name: String, noinline block: OpenApiHeader.() -> Unit) =
-        header(name, object : TypeReference<TYPE>() {}.type, block)
+        header(name, captureType<TYPE>(), block)
 
     fun getHeaders(): Map<String, OpenApiHeader> = headers
 

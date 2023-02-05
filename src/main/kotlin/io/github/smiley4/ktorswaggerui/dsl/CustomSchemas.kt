@@ -1,18 +1,18 @@
 package io.github.smiley4.ktorswaggerui.dsl
 
+import io.github.smiley4.ktorswaggerui.CapturedType
 import io.swagger.v3.oas.models.media.Schema
-import java.lang.reflect.Type
 
 @OpenApiDslMarker
 class CustomSchemas {
 
-    private var jsonSchemaBuilder: ((type: Type) -> String?)? = null
+    private var jsonSchemaBuilder: ((type: CapturedType) -> String?)? = null
 
 
     /**
      * Custom builder for building json-schemas from a given type. Return null to not use this builder for the given type.
      */
-    fun jsonSchemaBuilder(builder: (type: Type) -> String?) {
+    fun jsonSchemaBuilder(builder: (type: CapturedType) -> String?) {
         jsonSchemaBuilder = builder
     }
 

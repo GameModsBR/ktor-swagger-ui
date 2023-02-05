@@ -5,8 +5,8 @@ plugins {
     `maven-publish`
 }
 
-group = "io.github.smiley4"
-version = "1.2.0"
+group = "com.github.GameModsBR"
+version = "develop-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -15,9 +15,11 @@ repositories {
 dependencies {
 
     val ktorVersion = "2.2.2"
+    implementation(kotlin("reflect"))
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-webjars:$ktorVersion")
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     testImplementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     testImplementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     testImplementation("io.ktor:ktor-serialization-jackson:$ktorVersion")

@@ -1,8 +1,7 @@
 package io.github.smiley4.ktorswaggerui.dsl
 
-import com.fasterxml.jackson.core.type.TypeReference
-import java.lang.reflect.Type
-import kotlin.reflect.KClass
+import io.github.smiley4.ktorswaggerui.CapturedType
+import io.github.smiley4.ktorswaggerui.captureType
 
 
 @OpenApiDslMarker
@@ -16,86 +15,58 @@ class OpenApiRequest {
     /**
      * A path parameters that is applicable for this operation
      */
-    fun pathParameter(name: String, type: Type, block: OpenApiRequestParameter.() -> Unit) {
-        parameters.add(OpenApiRequestParameter(name, type, OpenApiRequestParameter.Location.PATH).apply(block))
+    fun pathParameter(name: String, type: CapturedType, block: OpenApiRequestParameter.() -> Unit) {
+        parameters.add(OpenApiRequestParameter(name, type, OpenApiRequestParameter.Location.PATH)
+            .apply { required = true }
+            .apply(block))
     }
 
     /**
      * A path parameters that is applicable for this operation
      */
-    fun pathParameter(name: String, type: KClass<*>, block: OpenApiRequestParameter.() -> Unit) = pathParameter(name, type.java, block)
-
-    /**
-     * A path parameters that is applicable for this operation
-     */
-    fun pathParameter(name: String, type: KClass<*>) = pathParameter(name, type) {}
-
-    /**
-     * A path parameters that is applicable for this operation
-     */
-    inline fun <reified TYPE> pathParameter(name: String) = pathParameter(name, object : TypeReference<TYPE>() {}.type) {}
+    inline fun <reified TYPE> pathParameter(name: String) = pathParameter(name, captureType<TYPE>()) {}
 
     /**
      * A path parameters that is applicable for this operation
      */
     inline fun <reified TYPE> pathParameter(name: String, noinline block: OpenApiRequestParameter.() -> Unit) =
-        pathParameter(name, object : TypeReference<TYPE>() {}.type, block)
+        pathParameter(name, captureType<TYPE>(), block)
 
     /**
      * A query parameters that is applicable for this operation
      */
-    fun queryParameter(name: String, type: Type, block: OpenApiRequestParameter.() -> Unit) {
+    fun queryParameter(name: String, type: CapturedType, block: OpenApiRequestParameter.() -> Unit) {
         parameters.add(OpenApiRequestParameter(name, type, OpenApiRequestParameter.Location.QUERY).apply(block))
     }
 
     /**
      * A query parameters that is applicable for this operation
      */
-    fun queryParameter(name: String, type: KClass<*>, block: OpenApiRequestParameter.() -> Unit) = queryParameter(name, type.java, block)
-
-    /**
-     * A query parameters that is applicable for this operation
-     */
-    fun queryParameter(name: String, type: KClass<*>) = queryParameter(name, type) {}
-
-    /**
-     * A query parameters that is applicable for this operation
-     */
-    inline fun <reified TYPE> queryParameter(name: String) = queryParameter(name, object : TypeReference<TYPE>() {}.type) {}
+    inline fun <reified TYPE> queryParameter(name: String) = queryParameter(name, captureType<TYPE>()) {}
 
     /**
      * A query parameters that is applicable for this operation
      */
     inline fun <reified TYPE> queryParameter(name: String, noinline block: OpenApiRequestParameter.() -> Unit) =
-        queryParameter(name, object : TypeReference<TYPE>() {}.type, block)
+        queryParameter(name, captureType<TYPE>(), block)
 
     /**
      * A header parameters that is applicable for this operation
      */
-    fun headerParameter(name: String, type: Type, block: OpenApiRequestParameter.() -> Unit) {
+    fun headerParameter(name: String, type: CapturedType, block: OpenApiRequestParameter.() -> Unit) {
         parameters.add(OpenApiRequestParameter(name, type, OpenApiRequestParameter.Location.HEADER).apply(block))
     }
 
     /**
      * A header parameters that is applicable for this operation
      */
-    fun headerParameter(name: String, type: KClass<*>, block: OpenApiRequestParameter.() -> Unit) = headerParameter(name, type.java, block)
-
-    /**
-     * A header parameters that is applicable for this operation
-     */
-    fun headerParameter(name: String, type: KClass<*>) = headerParameter(name, type) {}
-
-    /**
-     * A header parameters that is applicable for this operation
-     */
-    inline fun <reified TYPE> headerParameter(name: String) = headerParameter(name, object : TypeReference<TYPE>() {}.type) {}
+    inline fun <reified TYPE> headerParameter(name: String) = headerParameter(name, captureType<TYPE>()) {}
 
     /**
      * A header parameters that is applicable for this operation
      */
     inline fun <reified TYPE> headerParameter(name: String, noinline block: OpenApiRequestParameter.() -> Unit) =
-        headerParameter(name, object : TypeReference<TYPE>() {}.type, block)
+        headerParameter(name, captureType<TYPE>(), block)
 
 
     fun getParameters(): List<OpenApiRequestParameter> = parameters
@@ -106,32 +77,20 @@ class OpenApiRequest {
     /**
      * The request body applicable for this operation
      */
-    fun body(type: Type, block: OpenApiSimpleBody.() -> Unit) {
+    fun body(type: CapturedType, block: OpenApiSimpleBody.() -> Unit) {
         body = OpenApiSimpleBody(type).apply(block)
     }
 
     /**
      * The request body applicable for this operation
      */
-    fun body(type: KClass<*>, block: OpenApiSimpleBody.() -> Unit) {
-        body = OpenApiSimpleBody(type.java).apply(block)
-    }
-
-    /**
-     * The request body applicable for this operation
-     */
     @JvmName("bodyGenericType")
-    inline fun <reified TYPE> body(noinline block: OpenApiSimpleBody.() -> Unit) = body(object : TypeReference<TYPE>() {}.type, block)
+    inline fun <reified TYPE> body(noinline block: OpenApiSimpleBody.() -> Unit) = body(captureType<TYPE>(), block)
 
     /**
      * The request body applicable for this operation
      */
-    fun body(type: KClass<*>) = body(type.java) {}
-
-    /**
-     * The request body applicable for this operation
-     */
-    inline fun <reified TYPE> body() = body(object : TypeReference<TYPE>() {}.type) {}
+    inline fun <reified TYPE> body() = body(captureType<TYPE>()) {}
 
     /**
      * The request body applicable for this operation

@@ -1,8 +1,7 @@
 package io.github.smiley4.ktorswaggerui.dsl
 
-import com.fasterxml.jackson.core.type.TypeReference
-import java.lang.reflect.Type
-import kotlin.reflect.KClass
+import io.github.smiley4.ktorswaggerui.CapturedType
+import io.github.smiley4.ktorswaggerui.captureType
 
 /**
  * A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.
@@ -21,7 +20,7 @@ class OpenApiResponse(val statusCode: String) {
     /**
      * Possible headers returned with this response
      */
-    fun header(name: String, type: Type, block: OpenApiHeader.() -> Unit) {
+    fun header(name: String, type: CapturedType, block: OpenApiHeader.() -> Unit) {
         headers[name] = OpenApiHeader().apply(block).apply {
             this.type = type
         }
@@ -30,19 +29,13 @@ class OpenApiResponse(val statusCode: String) {
     /**
      * Possible headers returned with this response
      */
-    fun header(name: String, type: KClass<*>) = header(name, type.java) {}
-
-
-    /**
-     * Possible headers returned with this response
-     */
-    inline fun <reified TYPE> header(name: String) = header(name, object : TypeReference<TYPE>() {}.type) {}
+    inline fun <reified TYPE> header(name: String) = header(name, captureType<TYPE>()) {}
 
     /**
      * Possible headers returned with this response
      */
     inline fun <reified TYPE> header(name: String, noinline block: OpenApiHeader.() -> Unit) =
-        header(name, object : TypeReference<TYPE>() {}.type, block)
+        header(name, captureType<TYPE>(), block)
 
     fun getHeaders(): Map<String, OpenApiHeader> = headers
 
@@ -52,15 +45,8 @@ class OpenApiResponse(val statusCode: String) {
     /**
      * The body returned with this response
      */
-    fun body(type: Type, block: OpenApiSimpleBody.() -> Unit) {
+    fun body(type: CapturedType, block: OpenApiSimpleBody.() -> Unit) {
         body = OpenApiSimpleBody(type).apply(block)
-    }
-
-    /**
-     * The body returned with this response
-     */
-    fun body(type: KClass<*>, block: OpenApiSimpleBody.() -> Unit) {
-        body = OpenApiSimpleBody(type.java).apply(block)
     }
 
     /**
@@ -68,17 +54,12 @@ class OpenApiResponse(val statusCode: String) {
      */
     @JvmName("bodyGenericType")
     inline fun <reified TYPE> body(noinline block: OpenApiSimpleBody.() -> Unit) =
-        body(object : TypeReference<TYPE>() {}.type, block)
+        body(captureType<TYPE>(), block)
 
     /**
      * The body returned with this response
      */
-    fun body(type: KClass<*>) = body(type.java) {}
-
-    /**
-     * The body returned with this response
-     */
-    inline fun <reified TYPE> body() = body(object : TypeReference<TYPE>() {}.type) {}
+    inline fun <reified TYPE> body() = body(captureType<TYPE>()) {}
 
     /**
      * The body returned with this response
