@@ -9,6 +9,7 @@ import io.swagger.v3.oas.models.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.json.JsonObject
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.starProjectedType
@@ -54,12 +55,18 @@ class OApiJsonSchemaBuilder {
                     type = "string"
                     when (descriptor.serialName) {
                         "Instant" -> format = "date-time"
+                        "UniqueId" -> {
+                            format = "uuid"
+                            example(UUID.randomUUID().toString())
+                        }
+                        else -> if (descriptor.isNullable) example("string?")
                     }
                 }
                 PrimitiveKind.CHAR -> {
                     type = "string"
                     minLength = 1
                     maxLength = 1
+                    if (descriptor.isNullable) example("c?") else example("c")
                 }
                 PrimitiveKind.BYTE -> {
                     type = "integer"
@@ -120,17 +127,50 @@ class OApiJsonSchemaBuilder {
                 StructureKind.OBJECT -> {
                     type = "object"
                 }
-                StructureKind.CLASS, PolymorphicKind.SEALED-> {
+                StructureKind.CLASS -> {
                     type = "object"
                     properties = descriptor.elementNames
                         .map { name ->
                             val index = descriptor.getElementIndex(name)
                             name to descriptor.getElementDescriptor(index)
-                        }.filter { (_, elementDescriptor) -> elementDescriptor.kind != SerialKind.CONTEXTUAL }
+                        }.associate { (name, elementDescriptor) ->
+                            val elementKType = elementDescriptor.capturedKClass?.starProjectedType
+                            name to build(CapturedType(elementKType, elementDescriptor), components, config)
+                        }
+                }
+                PolymorphicKind.SEALED -> {
+                    type = "object"
+                    val typeDescriptor = descriptor.getElementDescriptor(0)
+                    val contextualDescriptor = descriptor.elementNames.map { descriptor.getElementDescriptor(descriptor.getElementIndex(it)) }
+                        .first { it.kind == SerialKind.CONTEXTUAL }
+
+                    val typeName = descriptor.getElementName(0)
+                    properties = if (typeDescriptor == serialDescriptor<String>()) {
+                        mapOf(typeName to Schema<Any>().apply {
+                            type = "string"
+                            enum = contextualDescriptor.elementNames.toList()
+                            nullable = typeDescriptor.isNullable
+                        })
+                    } else {
+                        val typeDescriptorType = typeDescriptor.capturedKClass?.starProjectedType
+                        mapOf(typeName to build(CapturedType(typeDescriptorType, typeDescriptor), components, config).also {
+                            it.example(contextualDescriptor.elementNames.toList().random())
+                        })
+                    }
+
+                    properties = properties + descriptor.elementNames
+                        .map { name ->
+                            val index = descriptor.getElementIndex(name)
+                            name to descriptor.getElementDescriptor(index)
+                        }
+                        .filter { (_, elementDescriptor) -> elementDescriptor.kind != SerialKind.CONTEXTUAL }
+                        .filter { (name) -> name != typeName }
                         .associate { (name, elementDescriptor) ->
                             val elementKType = elementDescriptor.capturedKClass?.starProjectedType
                             name to build(CapturedType(elementKType, elementDescriptor), components, config)
                         }
+
+                    additionalProperties = true
                 }
                 PolymorphicKind.OPEN, SerialKind.CONTEXTUAL -> {
                     createObjectJsonSchema(capturedType, config)
