@@ -33,17 +33,24 @@ class OApiJsonSchemaBuilder {
         }
     }
 
-
     @OptIn(ExperimentalSerializationApi::class)
     private fun createSchema(descriptor: SerialDescriptor, capturedType: CapturedType, config: SwaggerUIPluginConfig): Schema<Any> {
         if (descriptor.isInline) {
             val elementDescriptor = descriptor.getElementDescriptor(0)
-            return createSchema(CapturedType(elementDescriptor.capturedKClass?.starProjectedType, elementDescriptor), config)
+            return createSchema(CapturedType(elementDescriptor.capturedKClass?.starProjectedType, elementDescriptor), config).apply {
+                description = descriptor.serialName
+            }
         }
         return Schema<Any>().apply {
+            nullable = descriptor.isNullable
             when (descriptor.kind) {
                 PrimitiveKind.BOOLEAN -> type = "boolean"
-                PrimitiveKind.STRING -> type = "string"
+                PrimitiveKind.STRING -> {
+                    type = "string"
+                    when (descriptor.serialName) {
+                        "Instant" -> format = "date-time"
+                    }
+                }
                 PrimitiveKind.CHAR -> {
                     type = "string"
                     minLength = 1
@@ -91,9 +98,11 @@ class OApiJsonSchemaBuilder {
                 }
                 StructureKind.MAP, StructureKind.OBJECT -> {
                     type = "object"
+                    nullable = descriptor.isNullable
                 }
                 StructureKind.CLASS, PolymorphicKind.SEALED-> {
                     type = "object"
+                    nullable = descriptor.isNullable
                     properties = descriptor.elementNames
                         .map { name ->
                             val index = descriptor.getElementIndex(name)
@@ -104,7 +113,11 @@ class OApiJsonSchemaBuilder {
                             name to createSchema(CapturedType(elementKType, elementDescriptor), config)
                         }
                 }
-                PolymorphicKind.OPEN, SerialKind.CONTEXTUAL -> createObjectJsonSchema(capturedType, config)
+                PolymorphicKind.OPEN, SerialKind.CONTEXTUAL -> {
+                    createObjectJsonSchema(capturedType, config).apply {
+                        nullable = descriptor.isNullable
+                    }
+                }
             }
         }
     }
