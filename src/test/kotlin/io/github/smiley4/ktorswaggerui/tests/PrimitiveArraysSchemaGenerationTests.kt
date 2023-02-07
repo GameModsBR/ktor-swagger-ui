@@ -1,8 +1,8 @@
 package io.github.smiley4.ktorswaggerui.tests
 
 import io.github.smiley4.ktorswaggerui.SwaggerUIPluginConfig
+import io.github.smiley4.ktorswaggerui.captureType
 import io.github.smiley4.ktorswaggerui.specbuilder.ComponentsContext
-import io.github.smiley4.ktorswaggerui.specbuilder.OApiSchemaBuilder
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
@@ -10,7 +10,7 @@ import java.math.BigDecimal
 class PrimitiveArraysSchemaGenerationTests : StringSpec({
 
     "generate schema for byte-array" {
-        getOApiSchemaBuilder().build(Array<Byte>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<Byte>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -18,7 +18,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
                 maximum = BigDecimal.valueOf(127)
             }
         }
-        getOApiSchemaBuilder().build(ByteArray::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<ByteArray>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -29,7 +29,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for unsigned byte" {
-        getOApiSchemaBuilder().build(Array<UByte>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<UByte>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -40,7 +40,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for short-array" {
-        getOApiSchemaBuilder().build(Array<Short>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<Short>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -48,7 +48,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
                 maximum = BigDecimal.valueOf(32767)
             }
         }
-        getOApiSchemaBuilder().build(ShortArray::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<ShortArray>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -59,7 +59,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for unsigned short" {
-        getOApiSchemaBuilder().build(Array<UShort>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<UShort>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -70,14 +70,14 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for integer-array" {
-        getOApiSchemaBuilder().build(Array<Int>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<Int>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
                 format = "int32"
             }
         }
-        getOApiSchemaBuilder().build(IntArray::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<IntArray>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -87,7 +87,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for unsigned integer" {
-        getOApiSchemaBuilder().build(Array<UInt>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<UInt>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -98,14 +98,14 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for long-array" {
-        getOApiSchemaBuilder().build(Array<Long>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<Long>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
                 format = "int64"
             }
         }
-        getOApiSchemaBuilder().build(LongArray::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<LongArray>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -115,7 +115,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for unsigned long" {
-        getOApiSchemaBuilder().build(Array<ULong>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<ULong>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "integer"
@@ -125,14 +125,14 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for float-array" {
-        getOApiSchemaBuilder().build(Array<Float>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<Float>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "number"
                 format = "float"
             }
         }
-        getOApiSchemaBuilder().build(FloatArray::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<FloatArray>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "number"
@@ -142,14 +142,14 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for double-array" {
-        getOApiSchemaBuilder().build(Array<Double>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<Double>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "number"
                 format = "double"
             }
         }
-        getOApiSchemaBuilder().build(DoubleArray::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<DoubleArray>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "number"
@@ -159,7 +159,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for character-array" {
-        getOApiSchemaBuilder().build(Array<Char>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<Char>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "string"
@@ -170,7 +170,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for string-array" {
-        getOApiSchemaBuilder().build(Array<String>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<String>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "string"
@@ -179,7 +179,7 @@ class PrimitiveArraysSchemaGenerationTests : StringSpec({
     }
 
     "generate schema for boolean-array" {
-        getOApiSchemaBuilder().build(Array<Boolean>::class.java, ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
+        getOApiSchemaBuilder().build(captureType<Array<Boolean>>(), ComponentsContext.NOOP, SwaggerUIPluginConfig()) shouldBeSchema {
             type = "array"
             items = Schema<String>().apply {
                 type = "boolean"

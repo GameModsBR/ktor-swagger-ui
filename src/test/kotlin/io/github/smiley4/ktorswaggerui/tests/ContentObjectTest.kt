@@ -1,24 +1,21 @@
 package io.github.smiley4.ktorswaggerui.tests
 
+import io.github.smiley4.ktorswaggerui.CapturedType
 import io.github.smiley4.ktorswaggerui.SwaggerUIPluginConfig
+import io.github.smiley4.ktorswaggerui.captureType
 import io.github.smiley4.ktorswaggerui.dsl.OpenApiMultipartBody
 import io.github.smiley4.ktorswaggerui.dsl.OpenApiSimpleBody
 import io.github.smiley4.ktorswaggerui.specbuilder.ComponentsContext
 import io.kotest.core.spec.style.StringSpec
-import io.ktor.http.ContentType
+import io.ktor.http.*
 import io.swagger.v3.oas.models.examples.Example
-import io.swagger.v3.oas.models.media.Content
-import io.swagger.v3.oas.models.media.Encoding
-import io.swagger.v3.oas.models.media.MediaType
-import io.swagger.v3.oas.models.media.Schema
-import io.swagger.v3.oas.models.media.XML
+import io.swagger.v3.oas.models.media.*
 import java.io.File
-import kotlin.reflect.KClass
 
 class ContentObjectTest : StringSpec({
 
     "test default (plain-text) content object" {
-        val content = buildContentObject(String::class) {}
+        val content = buildContentObject(captureType<String>()) {}
         content shouldBeContent {
             addMediaType(ContentType.Text.Plain.toString(), MediaType().apply {
                 schema = Schema<Any>().apply {
@@ -30,7 +27,7 @@ class ContentObjectTest : StringSpec({
     }
 
     "test default (json) content object" {
-        val content = buildContentObject(SimpleBody::class) {}
+        val content = buildContentObject(captureType<SimpleBody>()) {}
         content shouldBeContent {
             addMediaType(ContentType.Application.Json.toString(), MediaType().apply {
                 schema = Schema<Any>().apply {
@@ -47,7 +44,7 @@ class ContentObjectTest : StringSpec({
     }
 
     "test complete (plain-text) content object" {
-        val content = buildContentObject(String::class) {
+        val content = buildContentObject(captureType<String>()) {
             description = "Test Description"
             required = true
             example("Example1", "Example Value 1")
@@ -72,7 +69,7 @@ class ContentObjectTest : StringSpec({
     }
 
     "test xml content object" {
-        val content = buildContentObject(SimpleBody::class) {
+        val content = buildContentObject(captureType<SimpleBody>()) {
             mediaType(ContentType.Application.Xml)
         }
         content shouldBeContent {
@@ -216,17 +213,17 @@ class ContentObjectTest : StringSpec({
             }
         }
 
-        private fun buildContentObject(schema: KClass<*>?, builder: OpenApiSimpleBody.() -> Unit): Content {
+        private fun buildContentObject(schema: CapturedType?, builder: OpenApiSimpleBody.() -> Unit): Content {
             return buildContentObject(ComponentsContext.NOOP, schema, builder)
         }
 
 
         private fun buildContentObject(
             componentCtx: ComponentsContext,
-            type: KClass<*>?,
+            type: CapturedType?,
             builder: OpenApiSimpleBody.() -> Unit
         ): Content {
-            return getOApiContentBuilder().build(OpenApiSimpleBody(type?.java).apply(builder), componentCtx, pluginConfig())
+            return getOApiContentBuilder().build(OpenApiSimpleBody(type).apply(builder), componentCtx, pluginConfig())
         }
 
         private fun buildCustomContentObject(schemaId: String, componentCtx: ComponentsContext = ComponentsContext.NOOP): Content {

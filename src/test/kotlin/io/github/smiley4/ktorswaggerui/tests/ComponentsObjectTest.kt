@@ -1,6 +1,8 @@
 package io.github.smiley4.ktorswaggerui.tests
 
+import io.github.smiley4.ktorswaggerui.CapturedType
 import io.github.smiley4.ktorswaggerui.SwaggerUIPluginConfig
+import io.github.smiley4.ktorswaggerui.captureType
 import io.github.smiley4.ktorswaggerui.dsl.OpenApiExample
 import io.github.smiley4.ktorswaggerui.specbuilder.ComponentsContext
 import io.kotest.core.spec.style.StringSpec
@@ -12,26 +14,25 @@ import io.kotest.matchers.shouldBe
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.examples.Example
 import io.swagger.v3.oas.models.media.Schema
-import kotlin.reflect.KClass
 
 class ComponentsObjectTest : StringSpec({
 
     "test nothing in components section" {
         val context = ComponentsContext(false, mutableMapOf(), false, mutableMapOf(), false)
 
-        buildSchema(ComponentsTestClass1::class, context).let {
+        buildSchema(captureType<ComponentsTestClass1>(), context).let {
             it.type shouldBe "object"
             it.properties shouldHaveSize 2
             it.`$ref`.shouldBeNull()
         }
 
-        buildSchema(ComponentsTestClass2::class, context).let {
+        buildSchema(captureType<ComponentsTestClass2>(), context).let {
             it.type shouldBe "object"
             it.properties shouldHaveSize 2
             it.`$ref`.shouldBeNull()
         }
 
-        buildSchema(Array<ComponentsTestClass2>::class, context).let {
+        buildSchema(captureType<Array<ComponentsTestClass2>>(), context).let {
             it.type shouldBe "array"
             it.items.shouldNotBeNull()
             it.`$ref`.shouldBeNull()
@@ -71,19 +72,19 @@ class ComponentsObjectTest : StringSpec({
     "test schemas in components section" {
         val context = ComponentsContext(true, mutableMapOf(), false, mutableMapOf(), false)
 
-        buildSchema(ComponentsTestClass1::class, context).let {
+        buildSchema(captureType<ComponentsTestClass1>(), context).let {
             it.type.shouldBeNull()
             it.properties.shouldBeNull()
             it.`$ref` shouldBe "#/components/schemas/ComponentsTestClass1"
         }
 
-        buildSchema(ComponentsTestClass2::class, context).let {
+        buildSchema(captureType<ComponentsTestClass2>(), context).let {
             it.type.shouldBeNull()
             it.properties.shouldBeNull()
             it.`$ref` shouldBe "#/components/schemas/ComponentsTestClass2"
         }
 
-        buildSchema(Array<ComponentsTestClass2>::class, context).let {
+        buildSchema(captureType<Array<ComponentsTestClass2>>(), context).let {
             it.type shouldBe "array"
             it.properties.shouldBeNull()
             it.`$ref`.shouldBeNull()
@@ -138,19 +139,19 @@ class ComponentsObjectTest : StringSpec({
     "test examples in components section" {
         val context = ComponentsContext(false, mutableMapOf(), true, mutableMapOf(), false)
 
-        buildSchema(ComponentsTestClass1::class, context).let {
+        buildSchema(captureType<ComponentsTestClass1>(), context).let {
             it.type shouldBe "object"
             it.properties shouldHaveSize 2
             it.`$ref`.shouldBeNull()
         }
 
-        buildSchema(ComponentsTestClass2::class, context).let {
+        buildSchema(captureType<ComponentsTestClass2>(), context).let {
             it.type shouldBe "object"
             it.properties shouldHaveSize 2
             it.`$ref`.shouldBeNull()
         }
 
-        buildSchema(Array<ComponentsTestClass2>::class, context).let {
+        buildSchema(captureType<Array<ComponentsTestClass2>>(), context).let {
             it.type shouldBe "array"
             it.items.shouldNotBeNull()
             it.`$ref`.shouldBeNull()
@@ -200,7 +201,7 @@ class ComponentsObjectTest : StringSpec({
     "test schemas in component section using canonical name object refs" {
         val context = ComponentsContext(true, mutableMapOf(), false, mutableMapOf(), true)
 
-        buildSchema(ComponentsTestClass1::class, context).let {
+        buildSchema(captureType<ComponentsTestClass1>(), context).let {
             it.`$ref` shouldBe "#/components/schemas/io.github.smiley4.ktorswaggerui.tests.ComponentsObjectTest.Companion.ComponentsTestClass1"
         }
     }
@@ -213,8 +214,8 @@ class ComponentsObjectTest : StringSpec({
             return getOApiComponentsBuilder().build(context, listOf())
         }
 
-        private fun buildSchema(type: KClass<*>, context: ComponentsContext): Schema<*> {
-            return getOApiSchemaBuilder().build(type.java, context, SwaggerUIPluginConfig())
+        private fun buildSchema(type: CapturedType, context: ComponentsContext): Schema<*> {
+            return getOApiSchemaBuilder().build(type, context, SwaggerUIPluginConfig())
         }
 
         private fun buildExample(name: String, example: Any, context: ComponentsContext): Example {

@@ -4,14 +4,12 @@ import io.github.smiley4.ktorswaggerui.SwaggerUI
 import io.github.smiley4.ktorswaggerui.dsl.delete
 import io.github.smiley4.ktorswaggerui.dsl.get
 import io.github.smiley4.ktorswaggerui.dsl.post
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
-import io.ktor.server.application.install
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
-import io.ktor.server.response.respond
-import io.ktor.server.routing.routing
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 
 /**
@@ -37,7 +35,7 @@ fun main() {
                         description = "tags to filter by"
                         required = false
                     }
-                    queryParameter("limit", Int::class) {
+                    queryParameter<Int>("limit") {
                         description = "maximum number of results to return"
                         required = false
                     }
@@ -45,7 +43,7 @@ fun main() {
                 response {
                     HttpStatusCode.OK to {
                         description = "pet response"
-                        body(Array<Pet>::class) {
+                        body<Array<Pet>>() {
                             mediaType(ContentType.Application.Json)
                             mediaType(ContentType.Application.Xml)
                             example(

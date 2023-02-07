@@ -1,26 +1,23 @@
 package io.github.smiley4.ktorswaggerui.examples
 
-import com.github.victools.jsonschema.generator.Option
-import com.github.victools.jsonschema.generator.OptionPreset
-import com.github.victools.jsonschema.generator.SchemaGenerator
-import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder
-import com.github.victools.jsonschema.generator.SchemaVersion
+import com.github.victools.jsonschema.generator.*
 import com.github.victools.jsonschema.module.jackson.JacksonModule
 import io.github.smiley4.ktorswaggerui.SwaggerUI
 import io.github.smiley4.ktorswaggerui.dsl.get
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
-import io.ktor.server.application.install
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import io.ktor.server.routing.routing
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import java.lang.reflect.Type
+import kotlin.reflect.javaType
 
 /**
  * An example for building custom json-schemas
  */
+@OptIn(ExperimentalStdlibApi::class)
 fun main() {
 
     data class MyRequestData(
@@ -41,7 +38,7 @@ fun main() {
             schemas {
                 jsonSchemaBuilder { type ->
                     // custom converter from the given 'type' to a json-schema
-                    typeToJsonSchema(type)
+                    typeToJsonSchema(type.kType!!.javaType)
                 }
             }
         }

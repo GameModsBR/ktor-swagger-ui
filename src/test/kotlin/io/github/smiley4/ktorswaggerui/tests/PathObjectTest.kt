@@ -7,8 +7,7 @@ import io.github.smiley4.ktorswaggerui.specbuilder.ComponentsContext
 import io.github.smiley4.ktorswaggerui.specbuilder.RouteMeta
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.headers.Header
@@ -67,8 +66,8 @@ class PathObjectTest : StringSpec({
             summary = "Test Summary"
             description = "Test Description"
             request {
-                queryParameter("testParam", Int::class)
-                body(String::class) {
+                queryParameter<Int>("testParam")
+                body<String> {
                     description = "Test Request body"
                     required = true
                 }
@@ -79,7 +78,7 @@ class PathObjectTest : StringSpec({
                     header<String>("testHeader") {
                         description = "Test Header"
                     }
-                    body(String::class) {
+                    body<String> {
                         description = "Test Response body"
                         required = true
                     }
