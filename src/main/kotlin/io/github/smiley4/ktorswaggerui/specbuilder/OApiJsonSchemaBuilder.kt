@@ -149,35 +149,36 @@ class OApiJsonSchemaBuilder {
                     type = "object"
                     val typeDescriptor = descriptor.getElementDescriptor(0)
                     val contextualDescriptor = descriptor.elementNames.map { descriptor.getElementDescriptor(descriptor.getElementIndex(it)) }
-                        .first { it.kind == SerialKind.CONTEXTUAL }
+                        .firstOrNull { it.kind == SerialKind.CONTEXTUAL }
+                    if (contextualDescriptor != null) {
+                        val typeName = descriptor.getElementName(0)
+                        properties = if (typeDescriptor == serialDescriptor<String>()) {
+                            mapOf(typeName to Schema<Any>().apply {
+                                type = "string"
+                                enum = contextualDescriptor.elementNames.toList()
+                                nullable = typeDescriptor.isNullable
+                            })
+                        } else {
+                            val typeDescriptorType = typeDescriptor.capturedKClass?.starProjectedType
+                            mapOf(typeName to build(CapturedType(typeDescriptorType, typeDescriptor), components, config).also {
+                                it.example(contextualDescriptor.elementNames.toList().random())
+                            })
+                        }
 
-                    val typeName = descriptor.getElementName(0)
-                    properties = if (typeDescriptor == serialDescriptor<String>()) {
-                        mapOf(typeName to Schema<Any>().apply {
-                            type = "string"
-                            enum = contextualDescriptor.elementNames.toList()
-                            nullable = typeDescriptor.isNullable
-                        })
-                    } else {
-                        val typeDescriptorType = typeDescriptor.capturedKClass?.starProjectedType
-                        mapOf(typeName to build(CapturedType(typeDescriptorType, typeDescriptor), components, config).also {
-                            it.example(contextualDescriptor.elementNames.toList().random())
-                        })
+                        properties = properties + descriptor.elementNames
+                            .map { name ->
+                                val index = descriptor.getElementIndex(name)
+                                name to descriptor.getElementDescriptor(index)
+                            }
+                            .filter { (_, elementDescriptor) -> elementDescriptor.kind != SerialKind.CONTEXTUAL }
+                            .filter { (name) -> name != typeName }
+                            .associate { (name, elementDescriptor) ->
+                                val elementKType = elementDescriptor.capturedKClass?.starProjectedType
+                                name to build(CapturedType(elementKType, elementDescriptor), components, config)
+                            }
+
+                        additionalProperties = true
                     }
-
-                    properties = properties + descriptor.elementNames
-                        .map { name ->
-                            val index = descriptor.getElementIndex(name)
-                            name to descriptor.getElementDescriptor(index)
-                        }
-                        .filter { (_, elementDescriptor) -> elementDescriptor.kind != SerialKind.CONTEXTUAL }
-                        .filter { (name) -> name != typeName }
-                        .associate { (name, elementDescriptor) ->
-                            val elementKType = elementDescriptor.capturedKClass?.starProjectedType
-                            name to build(CapturedType(elementKType, elementDescriptor), components, config)
-                        }
-
-                    additionalProperties = true
                 }
                 PolymorphicKind.OPEN, SerialKind.CONTEXTUAL -> {
                     createObjectJsonSchema(capturedType, config)
