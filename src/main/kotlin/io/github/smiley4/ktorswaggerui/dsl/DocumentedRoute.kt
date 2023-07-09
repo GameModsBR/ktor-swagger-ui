@@ -216,6 +216,7 @@ inline fun <reified R : Any> Route.patch(
 }
 
 @JvmName("patchTypedPath")
+@KtorDsl
 inline fun <reified R : Any> Route.patch(
     path: String,
     noinline builder: OpenApiRoute.() -> Unit = { },
