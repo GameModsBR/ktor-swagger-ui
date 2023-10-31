@@ -34,6 +34,8 @@ class OpenApiRoute {
      */
     var securitySchemeName: String? = null
 
+    var deprecated: Boolean? = null
+
     private val request = OpenApiRequest()
 
 

@@ -2,8 +2,7 @@ package io.github.smiley4.ktorswaggerui.specbuilder
 
 import io.github.smiley4.ktorswaggerui.SwaggerUIPluginConfig
 import io.github.smiley4.ktorswaggerui.dsl.OpenApiResponse
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.responses.ApiResponses
@@ -26,6 +25,7 @@ class OApiPathBuilder {
                 summary = route.documentation.summary
                 description = route.documentation.description
                 operationId = route.documentation.operationId
+                deprecated = route.documentation.deprecated
                 parameters = parametersBuilder.build(route.documentation.getRequest().getParameters(), config)
                 route.documentation.getRequest().getBody()?.let {
                     requestBody = requestBodyBuilder.build(it, components, config)
